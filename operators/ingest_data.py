@@ -28,7 +28,12 @@ class IngestData(BaseOperator):
     
     @staticmethod    
     def declare_inputs():
-        return []
+        return [
+            {
+                "name": "input_url",
+                "data_type": "string",
+            }
+        ]
     
     @staticmethod    
     def declare_outputs():
@@ -48,7 +53,9 @@ class IngestData(BaseOperator):
         self.ingest(params, ai_context)
 
     def ingest(self, params, ai_context):
-        data_uri = params.get('data_uri')
+        data_uri = params.get('data_uri', None)
+        if not data_uri:
+            data_uri = ai_context.get_input('input_url', self)
         ai_context.storage['ingested_url'] = data_uri
         if self.is_url(data_uri):
             text = self.scrape_text(data_uri)
