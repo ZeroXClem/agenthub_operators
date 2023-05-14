@@ -84,5 +84,3 @@ class ScrapeHackerNews(BaseOperator):
         ai_context.set_output('title_link_dict', json.dumps(title_link_dict), self)
         ai_context.add_to_log(f"{num_pages} page(s) of Hacker News have been scraped and filtered.")
 
-        ai_context.set_output('title_link_dict', json.dumps(title_link_dict), self)
-        ai_context.add_to_log(f"{num_pages} page(s) of Hacker News have been scraped and filtered.")
