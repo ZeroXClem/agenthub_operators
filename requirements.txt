@@ -1,0 +1,12 @@
+pyyaml
+pytz
+openai
+lxml
+beautifulsoup4
+tenacity
+PyGithub 
+unidiff
+tweepy
+langchain
+pymupdf
+requests
