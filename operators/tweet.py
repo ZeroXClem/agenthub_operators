@@ -26,7 +26,7 @@ class Tweet(BaseOperator):
                 "data_type": "string",
                 "placeholder": "Enter the text to tweet"
             }
-            ]
+        ]
 
     @staticmethod
     def declare_outputs():
@@ -57,6 +57,7 @@ class Tweet(BaseOperator):
 
         tweet_status = self.send_tweet(tweet_text, url, ai_context)
         ai_context.set_output('tweet_status', tweet_status, self)
+        ai_context.memory_add_to_list('tweeted_links', url)
 
     def send_tweet(self, tweet_text, url, ai_context):
         client = tweepy.Client(bearer_token=self.bearer_token)

@@ -48,7 +48,11 @@ class FindBestPost(BaseOperator):
         print("posts: ", posts)
         title_link_dict = json.loads(posts)
         
+        
+        
         used_links = ai_context.memory_get_list('tweeted_links')
+        
+        print(f"used_links = {used_links}\ntitle_link_dict = {title_link_dict}")
         title_link_dict = {title: url for title, url in title_link_dict.items() if url not in used_links}
         
         print(title_link_dict)
@@ -73,5 +77,4 @@ class FindBestPost(BaseOperator):
         ai_context.add_to_log(f"The most relevant post to your query is titled: {best_post_title}. With Link: {best_post_link}", self)
         
         ai_context.set_output('best_post_link', best_post_link, self)
-        ai_context.memory_add_to_list('tweeted_links', best_post_link)
 
