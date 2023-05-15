@@ -59,7 +59,7 @@ class FindBestPost(BaseOperator):
         # Converting titles into a context string
         context_string = ', '.join(title_link_dict.keys())
         
-        ai_context.add_to_log(f"Analyzing post titles: {context_string}.", self)
+        ai_context.add_to_log(f"Analyzing {len(title_link_dict)} potential post(s).", self)
 
         # Final prompt string
         message = f"From the following post titles: {context_string}, pick the post that most closely reflects this desire: {query}? Return the title of the post selected and nothing else."
