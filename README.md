@@ -33,4 +33,4 @@ This repository is a place to ask questions, understand, and contribute operator
 
 ## Project Structure
 
-There are three main parts of this repository -->
+There are three main parts of this repository: -->
