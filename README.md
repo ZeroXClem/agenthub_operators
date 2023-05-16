@@ -20,10 +20,10 @@
 </p>
 
 
-<p align="center">
+<!-- <p align="center">
 <a href="https://github.com/misha-agenthub/agenthub_operators/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=misha-agenthub/agenthub_operators" />
-</a>
+</a> -->
 
 # About
 
