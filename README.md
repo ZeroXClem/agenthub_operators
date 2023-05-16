@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <span style="font-size: 36px;"><strong>AgentHub</strong></span>
+  <span style="font-size: 72px;"><strong>AgentHub</strong></span>
 </p>
 
 
