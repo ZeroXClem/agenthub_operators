@@ -3,9 +3,9 @@
 <a "https://agenthub.dev/"><img src="https://cdn.discordapp.com/attachments/1095427515717267658/1108119925731627129/transparent.png" width="150px"></a>
 </p>
 
-<p align="center">
-  <span style="font-size: 72px;"><strong>AgentHub</strong></span>
-</p>
+<div align="center">
+  <h2><strong>AgentHub</strong></h2>
+</div>
 
 
 <p align=center>
