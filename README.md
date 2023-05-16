@@ -4,7 +4,7 @@
 </p>
 
 <div align="center">
-  <h2><strong>AgentHub</strong></h2>
+  <h3><strong>AgentHub</strong></h3>
 </div>
 
 
