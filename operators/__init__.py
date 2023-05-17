@@ -13,3 +13,4 @@ from .summarize import Summarize
 from .tweet import Tweet
 from .hacker_news import ScrapeHackerNews
 from .find_best_post import FindBestPost
+from .gmail_sender import GmailSender
