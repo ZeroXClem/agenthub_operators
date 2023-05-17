@@ -87,9 +87,13 @@ class Tweet(BaseOperator):
             response = client.create_tweet(
                 text=formatted_tweet_text
             )
-            ai_context.add_to_log(f"Tweet is live at: https://twitter.com/user/status/{response.data['id']}", color='green')
+            output = f"Tweet is live at: https://twitter.com/user/status/{response.data['id']}"
+            ai_context.add_to_log(output, color='green')
             
         except tweepy.TweepyException  as e:
             print(str(e))
-            ai_context.add_to_log(f"Error sending tweet: {str(e)}")
+            output = f"Error sending tweet: {str(e)}"
+            ai_context.add_to_log(output, color='red')
+            
+        return output
 
