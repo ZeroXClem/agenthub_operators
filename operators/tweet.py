@@ -39,13 +39,13 @@ class Tweet(BaseOperator):
         ]
         
     def set_twitter_keys_and_secrets(self, ai_context):
-        secret = "{" + ai_context.get_secret('twitter_api_key') + "}"
-        twitter_secret = json.loads(secret)
-        self.bearer_token = twitter_secret['BEARER_TOKEN']
-        self.consumer_key = twitter_secret['CONSUMER_KEY']
-        self.consumer_secret = twitter_secret['CONSUMER_SECRET']
-        self.access_token = twitter_secret['ACCESS_TOKEN']
-        self.access_token_secret = twitter_secret['ACCESS_SECRET']
+        app_secrets = json.loads(ai_context.get_secret('twitter_app_auth'))
+        user_secrets = json.loads(ai_context.get_secret('twitter_api_key'))        
+        self.bearer_token = app_secrets['BEARER_TOKEN']
+        self.consumer_key = app_secrets['CONSUMER_KEY']
+        self.consumer_secret = app_secrets['CONSUMER_SECRET']
+        self.access_token = user_secrets['ACCESS_TOKEN']
+        self.access_token_secret = user_secrets['ACCESS_SECRET']
 
     def run_step(
         self,
