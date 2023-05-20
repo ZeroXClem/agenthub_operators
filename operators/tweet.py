@@ -59,16 +59,16 @@ class Tweet(BaseOperator):
         tweet_status = self.send_tweet(tweet_text, url, ai_context)
         ai_context.set_output('tweet_status', tweet_status, self)
         ai_context.memory_add_to_list('tweeted_links', url)
-        
-    def is_over_twitter_limit(self, text):
-        return len(text) > 280
-    
-    def remove_hashtags(self, text):
-        # Pattern for hashtags: a hash symbol followed by any number of alphanumeric characters
-        hashtag_pattern = r'#\w+'
-        # Use the sub function to replace the hashtags with an empty string
-        no_hashtags = re.sub(hashtag_pattern, '', text)
-        return no_hashtags
+         
+    def trim_trailing_hashtags(self, text, url):
+        words = text.split()
+        while len(' '.join(words)) + len(url) > 280:
+            if words[-1].startswith('#'):
+                words = words[:-1]
+            else:
+                break
+        return ' '.join(words)
+
 
     def send_tweet(self, tweet_text, url, ai_context):
         client = tweepy.Client(bearer_token=self.bearer_token)
@@ -76,12 +76,12 @@ class Tweet(BaseOperator):
             consumer_key=self.consumer_key, consumer_secret=self.consumer_secret,
             access_token=self.access_token, access_token_secret=self.access_token_secret
         )
+                
+        # If tweet is too long, remove trailing hashtags
+        tweet_text = self.trim_trailing_hashtags(tweet_text, url)
+            
         formatted_tweet_text = f"{tweet_text}\n{url}"
-        
-        # If tweet is too long, remove hashtags
-        if self.is_over_twitter_limit(formatted_tweet_text):
-            formatted_tweet_text = self.remove_hashtags(formatted_tweet_text)
-        
+
         ai_context.add_to_log(f'Tweeting: {formatted_tweet_text}')
         try:
             response = client.create_tweet(
