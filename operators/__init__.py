@@ -8,6 +8,7 @@ from .ingest_data import IngestData
 from .index_data import IndexData
 from .split_data import SplitData
 from .ingest_pdf import IngestPDF
+from .ingest_docs import IngestDocs
 from .hybrid_search import HybridSearch
 from .summarize import Summarize
 from .tweet import Tweet
