@@ -16,16 +16,16 @@ class SplitData(BaseOperator):
     @staticmethod
     def declare_parameters():
         return [
-            # {
-            #     "name": "chunk_size",
-            #     "data_type": "integer",
-            #     "placeholder": "Enter Chunk Size (Optional: Default is 2000)"
-            # },
-            # {
-            #     "name": "chunk_overlap",
-            #     "data_type": "integer",
-            #     "placeholder": "Enter Chunk Overlap (Optional: Default is 100)"
-            # }
+            {
+                "name": "chunk_size",
+                "data_type": "integer",
+                "placeholder": "Enter Chunk Size (Optional: Default is 2000)"
+            },
+            {
+                "name": "chunk_overlap",
+                "data_type": "integer",
+                "placeholder": "Enter Chunk Overlap (Optional: Default is 100)"
+            }
         ]
 
     @staticmethod
@@ -51,20 +51,30 @@ class SplitData(BaseOperator):
             step,
             ai_context: AiContext
     ):
-        text = ai_context.get_input('text', self)
-        split_text = self.process(text, ai_context)
+        params = step['parameters']
+        split_text = self.process(params, ai_context)
         ai_context.set_output('rts_processed_content', split_text, self)
         ai_context.add_to_log("Successfully split text!")
 
-    def process(self, text, ai_context):
-        content = text
-        formatted = self.split(content)
+    def process(self, params, ai_context):
+        text = ai_context.get_input('text', self)
+        formatted = self.split(params, ai_context, text)
         return formatted
 
-    def split(self, content):
-        chunk_size: str = 2000
-        chunk_overlap: str = 100
+    def split(self, params, ai_context, content):
+        chunk_size = params.get('chunk_size', '2000')
+        chunk_overlap = params.get('chunk_overlap', '100')
+
+        if chunk_size:
+            chunk_size = int(chunk_size)
+        else:
+            chunk_size = 2000
+
+        if chunk_overlap:
+            chunk_overlap = int(chunk_overlap)
+        else:
+            chunk_overlap = 100
+        ai_context.add_to_log(f"Splitting text with {chunk_size} size and {chunk_overlap} overlap")
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         texts = text_splitter.split_documents(content)
         return texts
-
