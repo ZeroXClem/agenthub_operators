@@ -1,7 +1,7 @@
 from langchain import OpenAI, PromptTemplate
 from langchain.prompts import PromptTemplate
 from langchain.chains.summarize import load_summarize_chain
-
+from langchain.chat_models import ChatOpenAI
 from .base_operator import BaseOperator
 
 from ai_context import AiContext
@@ -18,6 +18,11 @@ class Summarize(BaseOperator):
     @staticmethod
     def declare_parameters():
         return [
+            {
+                "name": "temperature",
+                "data_type": "float",
+                "placeholder": "Enter Temperature (Optional: Default is 0.2)"
+            }
         ]
 
     @staticmethod
@@ -43,22 +48,31 @@ class Summarize(BaseOperator):
             step,
             ai_context: AiContext
     ):
-        gpt_response = self.process(ai_context=ai_context)
+        params = step['parameters']
+        gpt_response = self.process(params=params, ai_context=ai_context)
         ai_context.set_output('summarize_gpt_response', gpt_response, self)
         ai_context.add_to_log(f"Response from GPT: {gpt_response}")
 
-    def process(self, ai_context):
+    def process(self, params, ai_context):
         response = self.chain(
+            params=params,
             data=ai_context.get_input('rts_processed_content', self), 
             openai_api_key=ai_context.get_secret('openai_token')
         )
         return response
 
-    def chain(self, data, openai_api_key):
-        llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
-        prompt_template = """Write a concise summary of the following:\n\n{text}\n\nANSWER:"""
-        PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
-        chain = load_summarize_chain(llm, chain_type="stuff", prompt=PROMPT)
+    def chain(self, params, data, openai_api_key):
+        temperature = params.get('temperature', '0.2')
+        # llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
+
+        if temperature:
+            temperature = float(temperature)
+        else:
+            temperature = 0.2
+
+        llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=temperature)
+        chain = load_summarize_chain(llm, chain_type="map_reduce", verbose=True)
         response = chain.run(data)
         return response
+
 
