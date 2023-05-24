@@ -36,7 +36,7 @@ class IngestPDF(BaseOperator):
         return [
             {
                 "name": "pdf_content",
-                "data_type": "string",
+                "data_type": "Document[]",
             }
         ]
 
@@ -53,6 +53,9 @@ class IngestPDF(BaseOperator):
         ai_context.storage['ingested_pdf_url'] = pdf_uri
         if self.is_url(pdf_uri):
             text = self.load_pdf(pdf_uri)
+            
+            print(f'Inget PDF: text = {text}, type(text) = {type(text)}')
+            
             ai_context.set_output('pdf_content', text, self)
             ai_context.add_to_log(f"Content from {pdf_uri} has been scraped.")
         else:
