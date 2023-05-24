@@ -55,8 +55,6 @@ class PersistVectorIndex(BaseOperator):
         vi_uuid = step['parameters'].get('index_id')
         vector_index = ai_context.get_input('vector_index', self)
         
-        print(f'type(vector_index) = {type(vector_index)}, vector_index = {vector_index}')
-        
         vi_uuid = ai_context.publish_vector_index(vector_index, vi_uuid=vi_uuid)
         ai_context.set_output('index_id', vi_uuid, self)
     

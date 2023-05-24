@@ -14,8 +14,6 @@ from ai_context import AiContext
 EMBEDDING_CTX_LENGTH = 1000
 EMBEDDING_ENCODING = 'cl100k_base'
 
-def set_key(openai_token):
-    openai.api_key = openai_token
 
 class IndexData(BaseOperator):
     def __init__(self):
@@ -54,19 +52,16 @@ class IndexData(BaseOperator):
         step,
         ai_context: AiContext
     ):
-        set_key(ai_context.get_secret('openai_token'))
         text = ai_context.get_input('text', self)
         text = self.clean_text(text)
-        embeddings_dict = self.len_safe_get_embedding(text)
+        embeddings_dict = self.len_safe_get_embedding(text, ai_context)
         ai_context.set_output('vector_index', embeddings_dict, self)
         ai_context.add_to_log("Indexing complete with {} chunk embeddings".format(len(embeddings_dict)))
-        
-    def get_embedding(self, text_or_tokens):
-        EMBEDDING_MODEL = 'text-embedding-ada-002'
-        return openai.Embedding.create(input=text_or_tokens, model=EMBEDDING_MODEL)["data"][0]["embedding"]
+    
     
     def clean_text(self, text):
         return text.replace("\n", " ")
+
 
     def batched(self, iterable, n):
         if n < 1:
@@ -74,6 +69,7 @@ class IndexData(BaseOperator):
         it = iter(iterable)
         while (batch := tuple(islice(it, n))):
             yield batch
+
 
     def chunked_tokens(self, text, encoding_name, chunk_length):
         encoding = tiktoken.get_encoding(encoding_name)
@@ -83,10 +79,17 @@ class IndexData(BaseOperator):
             decoded_chunk = encoding.decode(chunk)  # Decode the chunk
             yield decoded_chunk
 
-    def len_safe_get_embedding(self, text, max_tokens=EMBEDDING_CTX_LENGTH, encoding_name=EMBEDDING_ENCODING):
+
+    def len_safe_get_embedding(
+        self, 
+        text, 
+        ai_context,
+        max_tokens=EMBEDDING_CTX_LENGTH, 
+        encoding_name=EMBEDDING_ENCODING
+    ):
         chunk_embeddings = {}
         for chunk in self.chunked_tokens(text, encoding_name=encoding_name, chunk_length=max_tokens):
-            embedding = self.get_embedding(chunk)
+            embedding = ai_context.embed_text(chunk)
             embedding_key = tuple(embedding)  # Convert numpy array to tuple
             chunk_embeddings[embedding_key] = chunk
 
