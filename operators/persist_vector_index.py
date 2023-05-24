@@ -19,8 +19,7 @@ class PersistVectorIndex(BaseOperator):
     def declare_parameters():
         return [
             {
-                # Optional, will overwrite existing index if present.
-                # Must check for ownership so that other users cannot nuke index created by somebody else.
+                "placeholder": "Vector Index Id to update (optional)",
                 "name": "index_id",
                 "data_type": "string",
             }
