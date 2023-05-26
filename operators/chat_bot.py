@@ -16,6 +16,10 @@ class ChatBot(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Ask Chat Bot'
+        
+    @staticmethod
+    def declare_description():
+        return "Given a 'query' (parameter) it would use Vector Index ('vector_index_id' parameter) and conversation history of current user to answer the question stated in 'query'"
 
     @staticmethod
     def declare_parameters():
@@ -57,6 +61,9 @@ class ChatBot(BaseOperator):
         query_emb = ai_context.embed_text(query)
         model_name = ai_context.get_model_name()
         vi_uuid = params['vector_index_id']
+        
+        print(f'vi_uuid = {vi_uuid}')
+        
         vi = ai_context.get_vector_index(vi_uuid)
 
         token_limit = get_max_tokens_for_model(model_name)

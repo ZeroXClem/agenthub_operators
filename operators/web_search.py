@@ -48,15 +48,14 @@ class WebSearch(BaseOperator):
         ]
         
     def run_step(self, step, ai_context):
-        msgs = self.gen_prompt_messages(step, ai_context)
-        ai_response = ai_context.run_chat_completion(msgs)
+        p = self.gen_prompt(step, ai_context)
+        ai_response = ai_context.run_chat_completion(prompt=p)
         
         ai_response_str = ai_response.replace('\\', '')
         
-        ai_context.add_to_log(f'ai_response_str = {ai_response_str}')
-        ai_context.save_log()
+        ai_context.add_to_log(f'ai_response_str = {ai_response_str}', save=True)
         
-        google_res = self.google_search(ai_response_str, 5)
+        google_res = self.google_search(ai_response_str, 5, ai_context)
         snippets, urls = self.get_urls_and_snippets(google_res)
         ai_context.add_to_log(f'Google results:\n urls={urls}\n snippets={snippets}') 
         ai_context.set_output(
@@ -79,16 +78,18 @@ class WebSearch(BaseOperator):
         return titles_and_snippets, links
     
 
-    def gen_prompt_messages(self, step, ai_context):
+    def gen_prompt(self, step, ai_context):
+        query_input = ai_context.get_input('query', self)
+        query_parameter = step['parameters'].get('query')
+        q = query_input or query_parameter
         p = f'''Return google search query which would achieve 
 the goal or answer question. Goal or question:
-{ai_context.get_input('query', self)}'''
-        ai_context.add_user_query(p)
+{q}'''
         ai_context.add_to_log(f"LLM prompt:\n{p}")
-        return ai_context.messages
+        return p
                   
 
-    def google_search(self, query, num_results) -> list[str]:
+    def google_search(self, query, num_results, ai_context) -> list[str]:
         try:
             custom_search_engine_id = ai_context.get_secret('google_search_engine_id')
             service = build(
