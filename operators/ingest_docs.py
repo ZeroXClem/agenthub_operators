@@ -13,9 +13,6 @@ from ai_context import AiContext
 
 
 class IngestDocs(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Ingest Documentation'

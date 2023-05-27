@@ -10,9 +10,6 @@ from .util import (
 
 
 class HybridSearch(BaseOperator):
-    def __init__(self):
-        super().__init__()
-        
     @staticmethod
     def declare_name():
         return 'Hybrid Search'

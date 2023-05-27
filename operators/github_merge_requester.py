@@ -9,9 +9,6 @@ from ai_context import AiContext
 
 
 class GitHubMergeRequester(BaseOperator):
-    def __init__(self):
-        super().__init__()
-    
     @staticmethod
     def declare_name():
         return 'Create GitHub merge requests'

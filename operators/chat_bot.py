@@ -10,9 +10,6 @@ from .util import (
 
 
 class ChatBot(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Ask Chat Bot'

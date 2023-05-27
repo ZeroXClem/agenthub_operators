@@ -6,9 +6,6 @@ from ai_context import AiContext
 
 
 class SplitData(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Recursively Split Text'

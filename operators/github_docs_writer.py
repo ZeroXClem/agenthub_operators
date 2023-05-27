@@ -5,9 +5,6 @@ from .base_operator import BaseOperator
 from ai_context import AiContext
 
 class GitHubDocsWriter(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Write documentation to GitHub'

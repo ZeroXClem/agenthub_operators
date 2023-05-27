@@ -16,9 +16,6 @@ EMBEDDING_ENCODING = 'cl100k_base'
 
 
 class IndexData(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Index Data'

@@ -9,9 +9,6 @@ from .base_operator import BaseOperator
 
 
 class IngestData(BaseOperator):
-    def __init__(self):
-        super().__init__()
-    
     @staticmethod
     def declare_name():
         return 'Ingest Data'

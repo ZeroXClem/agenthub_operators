@@ -4,9 +4,6 @@ from .base_operator import BaseOperator
 
 
 class AskChatGpt(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Ask ChatGPT'
@@ -37,6 +34,7 @@ class AskChatGpt(BaseOperator):
             {
                 "name": "question",
                 "data_type": "string",
+                "optional": "1"
             },
         ]
     

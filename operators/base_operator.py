@@ -1,8 +1,11 @@
-import uuid
+import shortuuid
 
 class BaseOperator:
-    def __init__(self):
-        self.id = str(uuid.uuid4())
+    def __init__(self, id=None):
+        if id:
+            self.id = id
+        else:
+            self.id = str(shortuuid.uuid())
 
     def run_step(self, ai_context):
         pass

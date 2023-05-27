@@ -9,9 +9,6 @@ from ai_context import AiContext
 
 
 class GitHubFileReader(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Get files from GitHub'

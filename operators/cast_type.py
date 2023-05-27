@@ -4,9 +4,6 @@ from ai_context import AiContext
 
 
 class CastType(BaseOperator):
-    def __init__(self):
-        super().__init__()
-
     @staticmethod
     def declare_name():
         return 'Cast Type'

@@ -8,9 +8,6 @@ from ai_context import AiContext
 import json
 
 class WebSearch(BaseOperator):
-    def __init__(self):
-        super().__init__()
-    
     @staticmethod    
     def declare_name():
         return 'Web search'
