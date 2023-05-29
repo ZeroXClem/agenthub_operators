@@ -32,7 +32,7 @@ class AskChatGpt(BaseOperator):
     def declare_inputs():
         return [
             {
-                "name": "question",
+                "name": "context",
                 "data_type": "string",
                 "optional": "1"
             },
@@ -49,14 +49,25 @@ class AskChatGpt(BaseOperator):
 
     def run_step(self, step, ai_context):
         p = step['parameters']
-        input_question = ai_context.get_input('question', self)
-        param_question = p['question']
-        prompt = input_question or param_question
-        context = p.get('context')
+        input_context = ai_context.get_input('context', self)
+        prompt = p['question']
+        param_context = p.get('context')
+        
+        if input_context and param_context:
+            context = f'[{input_context}] [{param_context}]'
+        elif input_context:
+            context = f'[{input_context}]'
+        elif param_context:
+            context = f'[{param_context}]'
+        else:
+            context = None
+
         if context:
-            prompt = f'given the context: {context} answer the question: {prompt}'
+            prompt = f'Given the context: {context}, answer the question or complete the following task: {prompt}'
+
         ai_response = ai_context.run_chat_completion(prompt=prompt)
         ai_context.set_output('chatgpt_response', ai_response, self)
         ai_context.add_to_log(f'Response from ChatGPT: {ai_response}', save=True)
+
         
         
