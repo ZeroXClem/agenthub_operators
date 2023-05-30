@@ -70,7 +70,7 @@ class GitHubFileReader(BaseOperator):
             
     def read_github_files(self, params, ai_context):
         repo_name = params['repo_name']
-        folders = params.get('folders')
+        folders = params.get('folders').replace(" ", "").split(',')
         file_regex = params.get('file_regex')
         branch = params.get('branch', 'master')
 
