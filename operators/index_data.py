@@ -20,6 +20,10 @@ class IndexData(BaseOperator):
     def declare_name():
         return 'Index Data'
     
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.MANIPULATE_DATA.value
+    
     @staticmethod    
     def declare_parameters():
         return []

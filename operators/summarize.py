@@ -11,6 +11,10 @@ class Summarize(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Summarize Content'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.AI.value
 
     @staticmethod
     def declare_parameters():

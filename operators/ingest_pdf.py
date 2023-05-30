@@ -13,6 +13,10 @@ class IngestPDF(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Ingest PDF'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.CONSUME_DATA.value
 
     @staticmethod
     def declare_parameters():

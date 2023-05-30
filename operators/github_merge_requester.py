@@ -12,6 +12,10 @@ class GitHubMergeRequester(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Create GitHub merge requests'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.ACT.value
         
     @staticmethod
     def declare_parameters():

@@ -10,6 +10,10 @@ class GitHubDocsWriter(BaseOperator):
     def declare_name():
         return 'GitHub Docs Writer'
     
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.ACT.value
+    
     @staticmethod    
     def declare_parameters():
         return [

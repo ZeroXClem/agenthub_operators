@@ -8,6 +8,10 @@ class GmailSender(BaseOperator):
     @staticmethod
     def declare_name():
         return 'GmailSender'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.ACT.value
 
     @staticmethod
     def declare_parameters():

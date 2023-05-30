@@ -13,6 +13,10 @@ class IngestData(BaseOperator):
     def declare_name():
         return 'Ingest Data'
     
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.CONSUME_DATA.value
+    
     @staticmethod    
     def declare_parameters():
         return [

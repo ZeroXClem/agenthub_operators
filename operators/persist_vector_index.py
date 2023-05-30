@@ -11,6 +11,10 @@ class PersistVectorIndex(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Persist Vector Index'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.MANIPULATE_DATA.value
 
     @staticmethod
     def declare_parameters():

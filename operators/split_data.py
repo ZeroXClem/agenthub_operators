@@ -9,6 +9,10 @@ class SplitData(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Recursively Split Text'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.MANIPULATE_DATA.value
 
     @staticmethod
     def declare_parameters():

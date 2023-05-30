@@ -9,6 +9,10 @@ class GmailReader(BaseOperator):
     @staticmethod
     def declare_name():
         return 'GmailReader'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.CONSUME_DATA.value
 
     @staticmethod
     def declare_parameters():

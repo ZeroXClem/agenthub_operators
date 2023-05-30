@@ -1,4 +1,5 @@
 import shortuuid
+from enum import Enum
 
 class BaseOperator:
     def __init__(self, id=None):
@@ -9,6 +10,14 @@ class BaseOperator:
 
     def run_step(self, ai_context):
         pass
+    
+    class OperatorCategory(Enum):
+        CONSUME_DATA = "Consume Data"
+        MANIPULATE_DATA = "Manipulate Data"
+        AI = "AI"
+        ACT = "Act"
+        MISC = "Misc"
+
      
     # This is user visible operator name that they select on the frontend.   
     @staticmethod
@@ -39,7 +48,11 @@ class BaseOperator:
     def declare_secrets():
         return []
     
-    # Plaian english explanation of what it does, optional.
+    # Plain english explanation of what it does, optional.
     @staticmethod
     def declare_description():
         return ""
+    
+    # Category operator falls into, helps guide operator selection in UI.
+    def declare_category():
+        return BaseOperator.OperatorCategory.MISC.value

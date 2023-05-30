@@ -14,6 +14,10 @@ class HybridSearch(BaseOperator):
     def declare_name():
         return 'Hybrid Search'
     
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.AI.value
+    
     @staticmethod    
     def declare_parameters():
         return [

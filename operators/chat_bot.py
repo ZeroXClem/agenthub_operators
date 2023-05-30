@@ -13,6 +13,10 @@ class ChatBot(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Ask Chat Bot'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.AI.value
         
     @staticmethod
     def declare_description():

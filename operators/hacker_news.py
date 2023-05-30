@@ -10,6 +10,10 @@ class ScrapeHackerNews(BaseOperator):
     def declare_name():
         return 'Scrape Hacker News'
     
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.CONSUME_DATA.value
+    
     @staticmethod    
     def declare_parameters():
         return [

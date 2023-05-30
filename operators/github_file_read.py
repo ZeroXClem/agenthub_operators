@@ -13,6 +13,10 @@ class GitHubFileReader(BaseOperator):
     def declare_name():
         return 'Get files from GitHub'
     
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.CONSUME_DATA.value
+    
     @staticmethod    
     def declare_parameters():
         return [

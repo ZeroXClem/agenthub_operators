@@ -16,6 +16,10 @@ class IngestDocs(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Ingest Documentation'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.CONSUME_DATA.value
 
     @staticmethod
     def declare_parameters():

@@ -11,6 +11,10 @@ class WebSearch(BaseOperator):
     @staticmethod    
     def declare_name():
         return 'Web search'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.CONSUME_DATA.value
         
     @staticmethod
     def declare_parameters():

@@ -6,6 +6,10 @@ class FindBestPost(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Find Best Post'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.AI.value
 
     @staticmethod
     def declare_parameters():

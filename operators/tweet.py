@@ -11,6 +11,10 @@ class Tweet(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Tweet'
+    
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.ACT.value
 
     @staticmethod
     def declare_parameters():

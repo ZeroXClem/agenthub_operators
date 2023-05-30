@@ -8,6 +8,10 @@ class AskChatGpt(BaseOperator):
     def declare_name():
         return 'Ask ChatGPT'
     
+    @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.AI.value
+    
     @staticmethod    
     def declare_parameters():
         return [
