@@ -54,7 +54,7 @@ class GitHubDocsWriter(BaseOperator):
         base_branch = repo.get_branch(base_branch_name)
 
         all_files = []
-        contents = forked_repo.get_contents("")
+        contents = repo.get_contents("")
         while contents:
             file_content = contents.pop(0)
             if file_content.type == "dir":
