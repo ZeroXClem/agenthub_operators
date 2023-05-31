@@ -19,3 +19,4 @@ from .persist_vector_index import PersistVectorIndex
 from .cast_type import CastType
 from .chat_bot import ChatBot
 from .full_text_search import FullTextSearch
+from .combine_strings import CombineStrings
