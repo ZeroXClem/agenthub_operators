@@ -10,9 +10,9 @@ class FullTextSearch(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Full Text Search'
+ 
     
-    
-        @staticmethod
+    @staticmethod
     def declare_category():
         return BaseOperator.OperatorCategory.MANIPULATE_DATA.value
 
