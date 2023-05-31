@@ -67,7 +67,7 @@ class GmailReader(BaseOperator):
         email_data, uploaded_file_names = self.read_emails(email, password, mark_as_read, ai_context)
         ai_context.set_output('email_data', email_data, self)
         # TODO: switch to multi attachment support when looping functionality is added to operators
-        ai_context.set_output('attached_file_names', uploaded_file_names[0], self)
+        ai_context.set_output('attached_file_name', uploaded_file_names[0], self)
 
     def get_body_from_part(self, part):
         if part.is_multipart():
