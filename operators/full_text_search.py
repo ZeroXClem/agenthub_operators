@@ -1,10 +1,12 @@
+import os, tempfile
+
 from whoosh import writing
 from whoosh.fields import Schema, TEXT
 from whoosh.qparser import QueryParser
 from whoosh.index import create_in, open_dir
 from whoosh.analysis import StemmingAnalyzer
 from whoosh.support.charset import accent_map
-import os, tempfile
+from whoosh.filedb.filestore import RamStorage
 
 from .base_operator import BaseOperator
 
@@ -88,7 +90,7 @@ class FullTextSearch(BaseOperator):
             parser = QueryParser("content", index.schema)
             q = parser.parse(query)
 
-            results = searcher.search(q, limit=max_num_results)
+            results = searcher.search(q, limit=int(max_num_results))
             result_strings = []
             result_metadata = []
 
@@ -106,8 +108,9 @@ class FullTextSearch(BaseOperator):
                 if len(' '.join(result_strings).split()) > output_budget_words:
                     break
 
+        ai_context.add_to_log(f'Search results: {result_strings}')
+
         ai_context.set_output('search_results', result_strings, self)
         ai_context.set_output('search_results_metadata', result_metadata, self)
 
-        os.rmdir(index_dir)
 
