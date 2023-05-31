@@ -1,38 +1,29 @@
+import spacy
+import heapq
 import os, tempfile
-
-from whoosh import writing
-from whoosh.fields import Schema, TEXT 
-from whoosh.qparser import QueryParser, OrGroup
-from whoosh.index import create_in, open_dir
-from whoosh.analysis import StemmingAnalyzer
-from whoosh.support.charset import accent_map
-from whoosh.filedb.filestore import RamStorage
 
 from .base_operator import BaseOperator
 
+nlp = spacy.load("en_core_web_sm")
 
 class FullTextSearch(BaseOperator):
     @staticmethod
     def declare_name():
         return 'Full Text Search'
     
+    
     @staticmethod    
     def declare_parameters():
         return [
-            {
-                "name": "output_budget_words",
-                "data_type": "integer",
-                "placeholder": "Enter maximum number of words in output"
-            },
             {
                 "name": "max_num_results",
                 "data_type": "integer",
                 "placeholder": "Enter maximum number of results"
             },
             {
-                "name": "result_context_length",
+                "name": "window_size",
                 "data_type": "integer",
-                "placeholder": "Enter context length around result in characters"
+                "placeholder": "Search window size in tokens, default is 100"
             },
             {
                 "name": "query",
@@ -40,6 +31,7 @@ class FullTextSearch(BaseOperator):
                 "placeholder": "Enter your query"
             }
         ]
+     
      
     @staticmethod   
     def declare_inputs():
@@ -55,6 +47,7 @@ class FullTextSearch(BaseOperator):
             },
         ]
     
+    
     @staticmethod 
     def declare_outputs():
         return [
@@ -68,55 +61,40 @@ class FullTextSearch(BaseOperator):
             }
         ]
 
+
     def run_step(self, step, ai_context):
         p = step['parameters']
         text = ai_context.get_input('text', self)
         query = ai_context.get_input('query', self) or p['query']
-        output_budget_words = p['output_budget_words']
-        max_num_results = p['max_num_results']
-        result_context_length = p['result_context_length']
+        max_num_results = int(p['max_num_results'] or 10)
+        window_size = int(p['window_size'] or 100)
+        doc = nlp(text)   
+        
+        query_tokens = [token.text.lower() for token in nlp(query) if self.token_is_word(token)]
+        print(f'query_tokens = {query_tokens}')
+        results = []
 
-        schema = Schema(content=TEXT(phrase=False, analyzer=StemmingAnalyzer()))
+        for i in range(len(doc) - window_size + 1):
+            window_tokens = [token.text.lower() for token in doc[i : i + window_size]]
+            score = self.calculate_relevance(window_tokens, query_tokens)
+            heapq.heappush(results, (-score, doc[i : i + window_size].text))
 
-        storage = RamStorage()
-        index = storage.create_index(schema)
+        output = []
+        for i in range(max_num_results):
+            if len(results):
+                t = heapq.heappop(results)
+                print(f'score = {t[0]}')
+                output.append(t[1])
 
-        # Add the input text to the index
-        writer = index.writer()
-        writer.add_document(content=text)
-        writer.commit()
+        ai_context.add_to_log(f'Search results: {output}')
+        ai_context.set_output('search_results', output, self)
 
-        with index.searcher() as searcher:
-            parser = QueryParser("content", index.schema, group=OrGroup)
-            q = parser.parse(query)
 
-            results = searcher.search(q, limit=int(max_num_results))
-            result_strings = []
-            result_metadata = []
-            
-            print('results:')
-            print(results.__dict__)
+    def token_is_word(self, token):
+        return not token.is_punct and not token.is_space and not token.is_stop
 
-            for hit in results:
-                print('hit:')
-                print(hit.__dict__)
-                
-                start_pos = max(0, hit.startchar - result_context_length)
-                end_pos = min(len(text), hit.endchar + result_context_length)
-                result = text[start_pos:end_pos]
-                result_strings.append(result)
-                result_metadata.append({
-                    'position': hit.pos,
-                    'start_char': hit.startchar,
-                    'end_char': hit.endchar
-                })
 
-                if len(' '.join(result_strings).split()) > output_budget_words:
-                    break
-
-        ai_context.add_to_log(f'Search results: {result_strings}')
-
-        ai_context.set_output('search_results', result_strings, self)
-        ai_context.set_output('search_results_metadata', result_metadata, self)
-
+    def calculate_relevance(self, window_tokens, query_tokens):
+        score = sum([window_tokens.count(token) for token in query_tokens ])
+        return score
 
