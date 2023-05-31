@@ -1,6 +1,7 @@
 import tiktoken
 import numpy as np
 
+
 def get_max_tokens_for_model(model_name: str) -> int:
     token_limits = {
         "gpt-3.5-turbo": 4096,

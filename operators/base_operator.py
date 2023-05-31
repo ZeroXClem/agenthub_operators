@@ -11,12 +11,13 @@ class BaseOperator:
     def run_step(self, ai_context):
         pass
     
+    
     class OperatorCategory(Enum):
-        CONSUME_DATA = "Consume Data"
-        MANIPULATE_DATA = "Manipulate Data"
-        AI = "AI"
-        ACT = "Act"
-        MISC = "Misc"
+        CONSUME_DATA = "Data Intake"
+        MANIPULATE_DATA = "Data Manipulation"
+        AI = "Using Large Language Models"
+        ACT = "Interact with the World"
+        MISC = "The rest"
 
      
     # This is user visible operator name that they select on the frontend.   

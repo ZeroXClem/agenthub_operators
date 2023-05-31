@@ -12,6 +12,11 @@ class FullTextSearch(BaseOperator):
         return 'Full Text Search'
     
     
+        @staticmethod
+    def declare_category():
+        return BaseOperator.OperatorCategory.MANIPULATE_DATA.value
+
+    
     @staticmethod    
     def declare_parameters():
         return [
