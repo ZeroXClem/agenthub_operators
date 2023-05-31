@@ -10,3 +10,4 @@ tweepy
 langchain
 pymupdf
 requests
+tabula-py

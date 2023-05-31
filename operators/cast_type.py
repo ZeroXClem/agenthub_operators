@@ -53,6 +53,7 @@ class CastType(BaseOperator):
                 # Document schema from lanchain for reference: 
                 # https://github.com/hwchase17/langchain/blob/master/langchain/schema.py#L269
                 res = " ".join([d.page_content for d in input])
+                
                 ai_context.set_output('output', res, self)
                 return True
             

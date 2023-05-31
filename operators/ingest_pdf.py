@@ -1,8 +1,8 @@
 import os
+import io
 import requests
-import tempfile
-
-from langchain.document_loaders import DirectoryLoader, PyMuPDFLoader
+import tabula
+import pandas as pd
 
 from .base_operator import BaseOperator
 
@@ -22,10 +22,17 @@ class IngestPDF(BaseOperator):
     def declare_parameters():
         return [
             {
-                "name": "pdf_uri", # testing: https://arxiv.org/pdf/2302.03803.pdf
+                "name": "pdf_uri",
                 "data_type": "string",
                 "placeholder": "Enter the URL of the PDF"
             }
+            # TODO: uncomment when there are more than 1 methods of parsing PDF.
+            #, 
+            #{
+            #    "name": "pdf_parsing_method",
+            #    "data_type": "string",
+            #    "placeholder": "default=tabula - for preservation of tables and spreadsheets"
+            #}
         ]
 
     @staticmethod
@@ -37,7 +44,7 @@ class IngestPDF(BaseOperator):
         return [
             {
                 "name": "pdf_content",
-                "data_type": "Document[]",
+                "data_type": "string",
             }
         ]
 
@@ -47,43 +54,12 @@ class IngestPDF(BaseOperator):
             ai_context: AiContext,
     ):
         params = step['parameters']
-        self.ingest(params, ai_context)
-
-    def ingest(self, params, ai_context):
-        pdf_uri = params.get('pdf_uri')
-        ai_context.storage['ingested_pdf_url'] = pdf_uri
-        if self.is_url(pdf_uri):
-            text = self.load_pdf(pdf_uri)
-            
-            #print(f'Inget PDF: text = {text}, type(text) = {type(text)}')
-            
-            ai_context.set_output('pdf_content', text, self)
-            ai_context.add_to_log(f"Content from {pdf_uri} has been scraped.")
-        else:
-            pass  # leave unimplemented for ingesting files later
-
-    def is_url(self, pdf_uri):
-        # add url validation maybe?
-        return True
-
-    def load_pdf(self, url):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            response = requests.get(url, stream=True)
-            path = os.path.join(tmpdir, 'output.pdf')
-
-            with open(path, "wb") as file:
-                for chunk in response.iter_content(chunk_size=8192):
-                    file.write(chunk)
-
-            loader = DirectoryLoader(tmpdir, glob="**/*.pdf", loader_cls=PyMuPDFLoader)
-            data = loader.load()
-
-            # init empty string
-            content = ""
-
-            # merge page contents
-            for doc in data:
-                content += doc.page_content + "\n"
-
-            return data
-
+        # Make sure Pandas data frames don't truncate cells of tables inside of PDF document.
+        pd.set_option('display.max_colwidth', None)
+        response = requests.get(params['pdf_uri'])
+        pdf_content = io.BytesIO(response.content)
+        df_list = tabula.read_pdf(pdf_content, pages='all')
+        pdf_content = "\n".join(df.to_string(index=False) for df in df_list)
+        #ai_context.add_to_log(f'PDF content: {pdf_content}')
+        ai_context.set_output('pdf_content', pdf_content, self)
+        
