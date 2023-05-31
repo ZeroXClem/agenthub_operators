@@ -1,8 +1,8 @@
 import os, tempfile
 
 from whoosh import writing
-from whoosh.fields import Schema, TEXT
-from whoosh.qparser import QueryParser
+from whoosh.fields import Schema, TEXT 
+from whoosh.qparser import QueryParser, OrGroup
 from whoosh.index import create_in, open_dir
 from whoosh.analysis import StemmingAnalyzer
 from whoosh.support.charset import accent_map
@@ -87,14 +87,20 @@ class FullTextSearch(BaseOperator):
         writer.commit()
 
         with index.searcher() as searcher:
-            parser = QueryParser("content", index.schema)
+            parser = QueryParser("content", index.schema, group=OrGroup)
             q = parser.parse(query)
 
             results = searcher.search(q, limit=int(max_num_results))
             result_strings = []
             result_metadata = []
+            
+            print('results:')
+            print(results.__dict__)
 
             for hit in results:
+                print('hit:')
+                print(hit.__dict__)
+                
                 start_pos = max(0, hit.startchar - result_context_length)
                 end_pos = min(len(text), hit.endchar + result_context_length)
                 result = text[start_pos:end_pos]
