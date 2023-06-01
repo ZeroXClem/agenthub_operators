@@ -11,6 +11,10 @@ class AskChatGpt(BaseOperator):
     @staticmethod
     def declare_category():
         return BaseOperator.OperatorCategory.AI.value
+        
+    @staticmethod
+    def declare_allow_batch():
+        return True
     
     @staticmethod    
     def declare_parameters():

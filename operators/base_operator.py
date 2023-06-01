@@ -19,7 +19,13 @@ class BaseOperator:
         ACT = "Interact with the World"
         MISC = "The rest"
 
-     
+    # Whether to allow AgentHub platform to execute opreator multiple times in a loop 
+    # on a vector inputs. This can be useful when you need to apply operator that is processing
+    # a single item to a number of entities in a pipeline.
+    @staticmethod
+    def declare_allow_batch():
+        return False
+
     # This is user visible operator name that they select on the frontend.   
     @staticmethod
     def declare_name():
