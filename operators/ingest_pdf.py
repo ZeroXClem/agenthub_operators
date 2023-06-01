@@ -45,6 +45,7 @@ class IngestPDF(BaseOperator):
             {
                 "name": "file_name",
                 "data_type": "string",
+                "optional": "1"
             }
         ]
 
