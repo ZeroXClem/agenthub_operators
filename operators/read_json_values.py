@@ -41,6 +41,22 @@ class ReadJsonValues(BaseOperator):
             }
         ]
 
+    def get_nested_values(self, json_object, keys):
+        values = []
+
+        for key in keys:
+            if '.' in key:
+                key, rest = key.split('.', 1)
+                if key in json_object and isinstance(json_object[key], list):
+                    for item in json_object[key]:
+                        values.extend(self.get_nested_values(item, [rest]))
+                elif key in json_object:
+                    values.extend(self.get_nested_values(json_object[key], [rest]))
+            elif key in json_object:
+                values.append(f'{key}: {json_object[key]}')
+
+        return values
+
     def run_step(
         self,
         step,
@@ -52,14 +68,12 @@ class ReadJsonValues(BaseOperator):
 
         try:
             json_object = json.loads(json_string)
-            values = []
 
-            for key in keys:
-                values.append(f'{key}: {json_object.get(key)}')
-
+            values = self.get_nested_values(json_object, keys)
+            
             json_values = ', '.join(values)
 
-            ai_context.add_to_log(f"Successfully read JSON values")
+            ai_context.add_to_log(f"Json values read: {json_values}")
             ai_context.set_output('json_values', json_values, self)
 
         except Exception as e:

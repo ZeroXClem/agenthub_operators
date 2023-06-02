@@ -70,7 +70,9 @@ class CastType(BaseOperator):
     def best_effort_string_to_list(self, s):
         try:
             result = json.loads(s)
-            if isinstance(result, list):
+            if isinstance(result, dict):
+                return [result]  # Wrap the dictionary in a list
+            elif isinstance(result, list):
                 return result
         except json.JSONDecodeError:
             pass

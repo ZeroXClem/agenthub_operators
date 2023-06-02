@@ -94,7 +94,6 @@ class IngestPDF(BaseOperator):
         
         text = self.read_pdf(file_data)
         ai_context.set_output('pdf_content', text, self)
-        ai_context.add_to_log(f"Content from {file_name if file_name else pdf_uri} has been scraped.")
         #ai_context.add_to_log(f"Scraped data {text}")
         
 
