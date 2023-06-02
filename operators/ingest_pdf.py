@@ -82,19 +82,21 @@ class IngestPDF(BaseOperator):
             ai_context.add_to_log(f"Content from uploaded file {uploaded_file_name} has been scraped.")
             
         # If file name has been provided via input, it takes precedence over pdf_uri
-        elif file_name:
+        elif file_name and file_name.strip() != '':
             file_data = self.load_pdf_from_storage(file_name, True, ai_context)
             ai_context.add_to_log(f"Content from {file_name} has been scraped.")
-
-
-        elif self.is_url(pdf_uri):
+            
+        elif pdf_uri and self.is_url(pdf_uri):
             file_data = self.load_pdf_from_uri(pdf_uri)
             ai_context.add_to_log(f"Content from uri {pdf_uri} has been scraped.")
+            
+        else:
+            ai_context.set_output('pdf_content', '', self)
+            ai_context.add_to_log("No file to read.")
+            return
 
-        
         text = self.read_pdf(file_data)
         ai_context.set_output('pdf_content', text, self)
-        #ai_context.add_to_log(f"Scraped data {text}")
         
 
     def is_url(self, pdf_uri):

@@ -87,8 +87,8 @@ class GmailReader(BaseOperator):
         return ''
 
     def read_emails(self, user: str, password: str, mark_as_read: bool, ai_context):
-        email_data = ''
-        uploaded_files = []
+        all_email_data = []
+        all_uploaded_files = []
         try:
             mail = imaplib.IMAP4_SSL("imap.gmail.com")
             mail.login(user, password)
@@ -97,63 +97,64 @@ class GmailReader(BaseOperator):
 
             result, data = mail.uid('search', None, "(UNSEEN)")  # search and return uids of all unread messages
             if result == 'OK':
-                num = data[0].split()[0]
-                result, data = mail.uid('fetch', num, '(BODY.PEEK[])')
-                if result == 'OK':
-                    raw_email = data[0][1]
-                    email_message = email.message_from_bytes(raw_email)
-                    body = ''
-                    file_paths_to_save = []
+                for num in data[0].split():  # iterate over all unread messages
+                    result, data = mail.uid('fetch', num, '(BODY.PEEK[])')
+                    if result == 'OK':
+                        raw_email = data[0][1]
+                        email_message = email.message_from_bytes(raw_email)
+                        body = ''
+                        file_paths_to_save = []
 
-                    with tempfile.TemporaryDirectory() as tempdir:
-                        for part in email_message.walk():
-                            if part.get_content_disposition() == 'attachment':
-                                file_data = part.get_payload(decode=True)
-                                file_name = part.get_filename()
-                                if file_name:
-                                    file_path = os.path.join(tempdir, file_name)
-                                    with open(file_path, 'wb') as temp:
-                                        temp.write(file_data)
-                                    file_paths_to_save.append(file_path)
+                        with tempfile.TemporaryDirectory() as tempdir:
+                            for part in email_message.walk():
+                                if part.get_content_disposition() == 'attachment':
+                                    file_data = part.get_payload(decode=True)
+                                    file_name = part.get_filename()
+                                    if file_name:
+                                        file_path = os.path.join(tempdir, file_name)
+                                        with open(file_path, 'wb') as temp:
+                                            temp.write(file_data)
+                                        file_paths_to_save.append(file_path)
 
-                            elif part.get_content_type() == 'text/plain':
-                                text = part.get_payload(decode=True)
-                                charset = part.get_content_charset()
-                                if charset:
-                                    text = text.decode(charset)
-                                body += text
-                        
-                        # Upload attachments to Google Cloud Storage
-                        uploaded_files = self.upload_attachments(file_paths_to_save, ai_context)
+                                elif part.get_content_type() == 'text/plain':
+                                    text = part.get_payload(decode=True)
+                                    charset = part.get_content_charset()
+                                    if charset:
+                                        text = text.decode(charset)
+                                    body += text
 
-                    email_info = {
-                        'name': email_message['Subject'],  # Use 'Subject' as 'name'
-                        'content': {
-                            'From': email_message['From'],
-                            'Subject': email_message['Subject'],
-                            'Date': email_message['Date'],
-                            'Body': body,
-                            'Attachments': uploaded_files
+                            # Upload attachments to Google Cloud Storage
+                            uploaded_files = self.upload_attachments(file_paths_to_save, ai_context)
+
+                        email_info = {
+                            'name': email_message['Subject'],  # Use 'Subject' as 'name'
+                            'content': {
+                                'From': email_message['From'],
+                                'Subject': email_message['Subject'],
+                                'Date': email_message['Date'],
+                                'Body': body,
+                                'Attachments': uploaded_files
+                            }
                         }
-                    }
 
-                    email_data = str(email_info)
-                    ai_context.add_to_log(f"Read email: {email_info}")
+                        all_email_data.append(str(email_info))
 
-                    if mark_as_read:
-                        mail.uid('store', num, '+FLAGS', '\Seen')
+                        if mark_as_read:
+                            mail.uid('store', num, '+FLAGS', '\Seen')
 
-                    ai_context.add_to_log(f"Emails read successfully", color='green')
-                else:
-                    ai_context.add_to_log("No new email.")
+                        # Add the first attachment name if it exists, or an empty string if not
+                        all_uploaded_files.append(uploaded_files[0] if uploaded_files else '')
+
+                    else:
+                        ai_context.add_to_log("No new email.")
             else:
                 ai_context.add_to_log("No new email.")
 
             mail.logout()
-            return email_data, uploaded_files
+            return all_email_data, all_uploaded_files
         except Exception as error:
             ai_context.add_to_log(f"An error occurred: {str(error)}")
-            return ''
+            return '', ''
 
         
     def upload_attachments(self, file_paths, ai_context):
