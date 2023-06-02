@@ -58,7 +58,7 @@ class FullTextSearch(BaseOperator):
         return [
             {
                 "name": "search_results",
-                "data_type": "string[]",
+                "data_type": "string",
             },
             {
                 "name": "search_results_metadata",
@@ -91,8 +91,10 @@ class FullTextSearch(BaseOperator):
                 print(f'score = {t[0]}')
                 output.append(t[1])
 
-        ai_context.add_to_log(f'Search results: {output}')
-        ai_context.set_output('search_results', output, self)
+        # Join all strings in output list into a single string separated by newline
+        output_string = "\n".join(output)
+        ai_context.add_to_log(f'Search results: {output_string}')
+        ai_context.set_output('search_results', output_string, self)
 
 
     def token_is_word(self, token):
