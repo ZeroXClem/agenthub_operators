@@ -93,7 +93,6 @@ class FullTextSearch(BaseOperator):
 
         # Join all strings in output list into a single string separated by newline
         output_string = "\n".join(output)
-        ai_context.add_to_log(f'Search results: {output_string}')
         ai_context.set_output('search_results', output_string, self)
 
 
