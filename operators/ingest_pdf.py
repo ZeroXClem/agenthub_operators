@@ -77,6 +77,7 @@ class IngestPDF(BaseOperator):
     def ingest(self, pdf_uri, file_name, uploaded_file_name, ai_context):
         # Uploaded file name is used to ingest a file previously uploaded to your workspace. 
         if uploaded_file_name:
+            ai_context.add_to_log(f"Loading {uploaded_file_name} from storage.")
             file_data = self.load_pdf_from_storage(uploaded_file_name, False, ai_context)
         # If file name has been provided via input, it takes precedence over pdf_uri
         elif file_name:
@@ -88,7 +89,6 @@ class IngestPDF(BaseOperator):
         text = self.read_pdf(file_data)
         ai_context.set_output('pdf_content', text, self)
         ai_context.add_to_log(f"Content from {file_name} has been scraped.")
-        ai_context.add_to_log(f"Scraped data {text}")
 
     def is_url(self, pdf_uri):
         # add url validation maybe?
