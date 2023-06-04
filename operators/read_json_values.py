@@ -21,6 +21,10 @@ class ReadJsonValues(BaseOperator):
                 "placeholder": "Ex: 'key1,key2,key3'"
             }
         ]
+    
+    @staticmethod
+    def declare_allow_batch():
+        return True
 
     @staticmethod
     def declare_inputs():

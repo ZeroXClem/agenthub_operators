@@ -19,6 +19,10 @@ class CombineStrings(BaseOperator):
                 "placeholder": "Ex: 'This is input 1: {input1} This is input 2: {input2}'"
             }
         ]
+    
+    @staticmethod
+    def declare_allow_batch():
+        return True
 
     @staticmethod
     def declare_inputs():

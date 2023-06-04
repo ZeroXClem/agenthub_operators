@@ -46,11 +46,11 @@ class GmailReader(BaseOperator):
         return [
             {
                 "name": "email_data",
-                "data_type": "string", 
+                "data_type": "string[]", 
             },
             {
-                "name": "attached_file_name",
-                "data_type": "string",
+                "name": "attached_file_names",
+                "data_type": "string[]",
             }
         ]
 
@@ -66,25 +66,7 @@ class GmailReader(BaseOperator):
         
         email_data, uploaded_file_names = self.read_emails(email, password, mark_as_read, ai_context)
         ai_context.set_output('email_data', email_data, self)
-        # TODO: switch to multi attachment support when looping functionality is added to operators
-        ai_context.set_output('attached_file_name', uploaded_file_names[0], self)
-
-    def get_body_from_part(self, part):
-        if part.is_multipart():
-            return ''.join(self.get_body_from_part(subpart) for subpart in part.get_payload())
-        if part.get_content_type() == 'text/plain':
-            text = part.get_payload(decode=True)
-            charset = part.get_content_charset()
-            if charset:
-                text = text.decode(charset)
-
-            # Clean up the text
-            lines = text.split('\r\n')
-            cleaned_lines = [line.strip() for line in lines if line.strip() != '']
-            cleaned_text = '\n'.join(cleaned_lines)
-
-            return cleaned_text
-        return ''
+        ai_context.set_output('attached_file_names', uploaded_file_names, self)        
 
     def read_emails(self, user: str, password: str, mark_as_read: bool, ai_context):
         all_email_data = []
@@ -92,7 +74,6 @@ class GmailReader(BaseOperator):
         try:
             mail = imaplib.IMAP4_SSL("imap.gmail.com")
             mail.login(user, password)
-
             mail.select("inbox")  # connect to inbox.
 
             result, data = mail.uid('search', None, "(UNSEEN)")  # search and return uids of all unread messages
@@ -141,9 +122,9 @@ class GmailReader(BaseOperator):
 
                         if mark_as_read:
                             mail.uid('store', num, '+FLAGS', '\Seen')
-
-                        # Add the first attachment name if it exists, or an empty string if not
-                        all_uploaded_files.append(uploaded_files[0] if uploaded_files else '')
+                        
+                        # TODO: switch to multi attachment support when looping functionality is added to operators
+                        all_uploaded_files.append(uploaded_files[0])  # Add all uploaded files
 
                     else:
                         ai_context.add_to_log("No new email.")
@@ -152,10 +133,10 @@ class GmailReader(BaseOperator):
 
             mail.logout()
             return all_email_data, all_uploaded_files
+
         except Exception as error:
             ai_context.add_to_log(f"An error occurred: {str(error)}")
-            return '', ''
-
+            return [], []  # Return empty lists in case of error
         
     def upload_attachments(self, file_paths, ai_context):
         uploaded_files = []
