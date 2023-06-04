@@ -32,7 +32,7 @@ class GmailReader(BaseOperator):
             },
             {
                 "name": "mark_as_read",
-                "data_type": "string",
+                "data_type": "boolean",
                 "placeholder": "Mark email as read (default is False)",
             }
         ]

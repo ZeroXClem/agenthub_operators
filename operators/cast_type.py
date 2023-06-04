@@ -19,7 +19,7 @@ class CastType(BaseOperator):
         return [
             {
                 "name": "output_type",
-                "data_type": "string",
+                "data_type": "enum(string,string[])",
                 "placeholder": "Output type to cast to."
             }
         ]
@@ -52,7 +52,7 @@ class CastType(BaseOperator):
         output_type = step['parameters'].get('output_type')
         if input_type == "Document[]":
             if output_type == 'string':
-                # Document schema from lanchain for reference: 
+                # Document schema from langchain for reference: 
                 # https://github.com/hwchase17/langchain/blob/master/langchain/schema.py#L269
                 res = " ".join([d.page_content for d in input])
                 
