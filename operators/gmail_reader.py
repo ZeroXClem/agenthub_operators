@@ -39,7 +39,13 @@ class GmailReader(BaseOperator):
 
     @staticmethod
     def declare_inputs():
-        return []
+        return [
+            {
+                "name": "email_id",
+                "data_type": "string",
+                "optional": "1"
+            }
+        ]
 
     @staticmethod
     def declare_outputs():
@@ -59,16 +65,17 @@ class GmailReader(BaseOperator):
         email = params.get('email')
         password = params.get('password')
         mark_as_read_str = params.get('mark_as_read')
+        email_id = ai_context.get_input('email_id', self)
 
         mark_as_read = False  # Default to False
         if mark_as_read_str and mark_as_read_str.lower() == 'true':
             mark_as_read = True
         
-        email_data, uploaded_file_names = self.read_emails(email, password, mark_as_read, ai_context)
+        email_data, uploaded_file_names = self.read_emails(email, password, mark_as_read, email_id, ai_context)
         ai_context.set_output('email_data', email_data, self)
         ai_context.set_output('attached_file_names', uploaded_file_names, self)        
 
-    def read_emails(self, user: str, password: str, mark_as_read: bool, ai_context):
+    def read_emails(self, user: str, password: str, mark_as_read: bool, email_id: str, ai_context):
         all_email_data = []
         all_uploaded_files = []
         try:
@@ -76,13 +83,17 @@ class GmailReader(BaseOperator):
             mail.login(user, password)
             mail.select("inbox")  # connect to inbox.
 
-            result, data = mail.uid('search', None, "(UNSEEN)")  # search and return uids of all unread messages
+            if email_id:
+                result, data = mail.uid('fetch', email_id, '(UID BODY.PEEK[])')  # Retrieve the specific email using its UID
+            else:
+                result, data = mail.uid('search', None, "(UNSEEN)")
             if result == 'OK':
                 for num in data[0].split():  # iterate over all unread messages
-                    result, data = mail.uid('fetch', num, '(BODY.PEEK[])')
+                    result, data = mail.uid('fetch', num, '(UID BODY.PEEK[])')  # Retrieve UID along with email
                     if result == 'OK':
                         raw_email = data[0][1]
                         email_message = email.message_from_bytes(raw_email)
+                        uid = data[0][0].decode().split()[2]  # Parse UID from response
                         body = ''
                         file_paths_to_save = []
 
@@ -108,7 +119,7 @@ class GmailReader(BaseOperator):
                             uploaded_files = self.upload_attachments(file_paths_to_save, ai_context)
 
                         email_info = {
-                            'name': email_message['Subject'],  # Use 'Subject' as 'name'
+                            'id': uid,  # Use 'UID' as 'id'
                             'content': {
                                 'From': email_message['From'],
                                 'Subject': email_message['Subject'],
@@ -119,7 +130,7 @@ class GmailReader(BaseOperator):
                         }
 
                         all_email_data.append(str(email_info))
-
+                        ai_context.add_to_log(f"Email {uid} with subject {email_info['content']['Subject']} has been read.")
                         if mark_as_read:
                             mail.uid('store', num, '+FLAGS', '\Seen')
                         
