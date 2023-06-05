@@ -37,6 +37,20 @@ class BaseOperator:
     def declare_parameters():
         return []
         
+    # For some operator we want to allow extra configuration that is out of the way de default, e.g.
+    # selecting model preference for operators that call LLMs. These would use default value for the
+    # pipeline run but occasionally you want to override model preference for one individual operator instance.
+    @classmethod
+    def declare_additional_parameters(cls):
+        if cls.declare_category() == BaseOperator.OperatorCategory.AI.value:
+            return [{
+                "name": "model_preference",
+                "data_type": "enum(gpt-4,gpt-3.5-turbo)",
+                "placeholder": ""
+            }]
+        else:
+            return []
+        
     # Input state that operator processes, e.g. a list of web links or a blob of text.
     # This is something that user cannot set manually on the UI for now, though later we might 
     # want to enable setting inputs from UI, e.g. for those operators that can be both the first one
@@ -61,5 +75,6 @@ class BaseOperator:
         return ""
     
     # Category operator falls into, helps guide operator selection in UI.
+    @staticmethod
     def declare_category():
         return BaseOperator.OperatorCategory.MISC.value
