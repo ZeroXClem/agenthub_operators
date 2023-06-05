@@ -1,3 +1,4 @@
+from email.mime.multipart import MIMEMultipart
 import smtplib
 from email.mime.text import MIMEText
 
@@ -20,6 +21,11 @@ class GmailSender(BaseOperator):
                 "name": "recipient_email",
                 "data_type": "string",
                 "placeholder": "Enter the recipient's email address"
+            },
+            {
+                "name": "send_as_html",
+                "data_type": "boolean",
+                "placeholder": "Send email as HTML (default is False)",
             }
         ]
 
@@ -48,18 +54,27 @@ class GmailSender(BaseOperator):
     ):
         params = step['parameters']
         recipient_email = params.get('recipient_email')
+        send_as_html_str = params.get('send_as_html')
+        send_as_html = False  # Default to False
+        if send_as_html_str and send_as_html_str.lower() == 'true':
+            send_as_html = True
+        
         email_subject = "AgentHub Run Notification"
         email_body = ai_context.get_input('email_body', self)
         sender = ai_context.get_secret('gmail_sender')
         password = ai_context.get_secret('gmail_password')
         print(f"sender: {sender}, password: {password}")
 
-        email_status = self.send_email(email_subject, email_body, sender, [recipient_email], password, ai_context)
+        email_status = self.send_email(email_subject, email_body, sender, [recipient_email], password, send_as_html, ai_context)
         ai_context.set_output('email_status', email_status, self)
 
-    def send_email(self, subject, body, sender, recipients, password, ai_context):
+    def send_email(self, subject, body, sender, recipients, password, send_as_html, ai_context):
         try:
-            msg = MIMEText(body)
+            if send_as_html:
+                msg = MIMEMultipart()
+                msg.attach(MIMEText(body, 'html'))
+            else:
+                msg = MIMEText(body)
             msg['Subject'] = subject
             msg['From'] = sender
             msg['To'] = ', '.join(recipients)
