@@ -5,6 +5,10 @@ from .base_operator import BaseOperator
 
 class SleepOperator(BaseOperator):
     @staticmethod
+    def declare_visibility():
+        return [('team', 'agenthub')]
+
+    @staticmethod
     def declare_description():
         return 'Just sleeps and does nothing useful, we are mostly adding it for testing purposes.'
     
