@@ -19,6 +19,11 @@ class InputOperator(BaseOperator):
                 "name": "value",
                 "data_type": "string",
                 "placeholder": "Anything you would like this operator instance to output"
+            },
+            {
+                "name": "input_name",
+                "data_type": "string",
+                "placeholder": "This input's identifier for auto-fill purposes",
             }
         ]
      
