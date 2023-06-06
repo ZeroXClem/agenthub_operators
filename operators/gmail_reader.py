@@ -135,7 +135,7 @@ class GmailReader(BaseOperator):
                             mail.uid('store', num, '+FLAGS', '\Seen')
                         
                         # TODO: switch to multi attachment support when looping functionality is added to operators
-                        all_uploaded_files.append(uploaded_files[0])  # Add all uploaded files
+                        all_uploaded_files.append(uploaded_files[0] if uploaded_files else "")  # Add all uploaded files
 
                     else:
                         ai_context.add_to_log("No new email.")
