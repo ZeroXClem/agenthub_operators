@@ -30,12 +30,14 @@ class CombineStrings(BaseOperator):
             {
                 "name": "input1",
                 "data_type": "string",
-                "placeholder": "Enter the first input string"
+                "placeholder": "Enter the first input string",
+                "optional": "1"
             },
             {
                 "name": "input2",
                 "data_type": "string",
-                "placeholder": "Enter the second input string"
+                "placeholder": "Enter the second input string",
+                "optional": "1"
             }
         ]
 
@@ -53,8 +55,8 @@ class CombineStrings(BaseOperator):
         step,
         ai_context: AiContext
     ):
-        input1 = ai_context.get_input('input1', self)
-        input2 = ai_context.get_input('input2', self)
+        input1 = ai_context.get_input('input1', self) or ''
+        input2 = ai_context.get_input('input2', self) or ''
         params = step['parameters']
         format_string = params.get('format')
         try:
@@ -63,4 +65,4 @@ class CombineStrings(BaseOperator):
             ai_context.set_output('combined_string', combined_string, self)
 
         except Exception as e:
-            ai_context.add_to_log(f"Failed to combine strings. Error: {e}", color='red') 
+            ai_context.add_to_log(f"Failed to combine strings. Error: {e}", color='red')
