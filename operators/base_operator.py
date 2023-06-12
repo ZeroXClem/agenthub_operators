@@ -15,6 +15,7 @@ class BaseOperator:
     class OperatorCategory(Enum):
         CONSUME_DATA = "Data Intake"
         MANIPULATE_DATA = "Data Manipulation"
+        DB = "Database I/O"
         AI = "Using LLMs"
         ACT = "Interact with the World"
         MISC = "The rest"
