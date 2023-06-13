@@ -22,4 +22,5 @@ from .full_text_search import FullTextSearch
 from .combine_strings import CombineStrings
 from .input_operator import InputOperator
 from .vectorize import VectorizeOperator
-from .store_in_database import StoreInDatabase
+from .store_in_db import StoreInDb
+from .text_search_in_db import TextSearchInDb

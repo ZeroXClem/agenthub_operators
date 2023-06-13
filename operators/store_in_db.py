@@ -5,10 +5,10 @@ from .base_operator import BaseOperator
 from ai_context import AiContext
 
 
-class StoreInDatabase(BaseOperator):
+class StoreInDb(BaseOperator):
     @staticmethod
     def declare_name():
-        return 'Store in database'
+        return 'Store in DB'
     
     @staticmethod
     def declare_category():
