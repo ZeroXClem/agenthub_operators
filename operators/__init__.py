@@ -21,6 +21,7 @@ from .chat_bot import ChatBot
 from .full_text_search import FullTextSearch
 from .combine_strings import CombineStrings
 from .input_operator import InputOperator
+from .output_operator import OutputOperator
 from .vectorize import VectorizeOperator
 from .store_in_db import StoreInDb
 from .text_search_in_db import TextSearchInDb

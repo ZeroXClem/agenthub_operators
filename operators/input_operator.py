@@ -9,6 +9,13 @@ class InputOperator(BaseOperator):
         return 'Input'
     
     @staticmethod
+    def declare_description():
+        return """Special type of operator that is used to (1) create a named input for a pipeline and 
+        (2) to store history of interactions with pipeline when it implements action of an Agent.
+        When testing you can specify 'value' parameter manually for Input operator.
+        """
+    
+    @staticmethod
     def declare_category():
         return BaseOperator.OperatorCategory.MISC.value
     
@@ -18,12 +25,29 @@ class InputOperator(BaseOperator):
             {
                 "name": "value",
                 "data_type": "string",
-                "placeholder": "Anything you would like this operator instance to output"
+                "description": "string value you would like this operator instance to output"
             },
             {
                 "name": "input_name",
                 "data_type": "string",
-                "placeholder": "This input's identifier for auto-fill purposes",
+                "description": "Named input for the pipeline, can be used to invoke the pipeline with specified input values.",
+            },
+            {
+                "name": "store_log",
+                "data_type": "boolean",
+                "description": "Whether you want to keep track of all the inputs that this pipeline was run with. Makes more sense when building interactive agents and less so for one off experiments."
+            },
+            {
+                "name": "log_visibility",
+                "data_type": "enum(user,team)",
+                "description": "When storing the history of inputs for this saved pipeline what level of granularity should the log be stored at.",
+                "condition": "store_log == true"
+            },
+            {
+                "name": "team_name",
+                "data_type": "string",
+                "description": "Team name to store the logs for",
+                "condition": "log_visibility == team"
             }
         ]
      
