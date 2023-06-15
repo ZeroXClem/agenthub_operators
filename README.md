@@ -50,3 +50,7 @@ We warmly welcome contributions! If you've devised a new operator and want to sh
 ## Community
 
 For those of you who need assistance, wish to discuss ideas, or just want to be part of the developer community, join us on Discord! Here's our [Discord invite link](https://discord.gg/SyCVmrzhCc).
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=agenthubdev/agenthub_operators&type=Date)](https://star-history.com/#agenthubdev/agenthub_operators&Date)
