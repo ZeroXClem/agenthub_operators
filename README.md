@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-<b><em>Seamlessly Automate Tasks of All Shapes and Sizes</em></b>
+<b><em>Build and Host AI powered pipelines</em></b>
 </p>
 
 
@@ -27,10 +27,26 @@
 
 # About
 
-This repository is a place to ask questions, understand, and contribute operators to [agenthub.dev](https://agenthub.dev). If you would like to ask a question you can join our [Discord](https://discord.gg/nVrtEJryA4) server, or if you would like to add an operator to the website you can create a pull request. All contributions and feedback are very appreciated.
+This repository contains all public AgentHub operators [agenthub.dev](https://agenthub.dev). AgentHub as a platform hosts and runs your AI pipelines that are built with these open source operators. 
 
-<!-- # Documentation
+# What is an Operator
 
-## Project Structure
+Each AI powered pipeline on AgentHub is made up of modular components called operators. An operator is a small building block that performs an explicit action (Ex: GmailReader reads emails, AskChatGPT queries the openAI api, Tweet send a tweet).
 
-There are three main parts of this repository: -->
+Each operator is a short python script wrapped in the same rigid structure that definines inputs, parameters, outputs and the "run_step". The run_step contains the logic of each operator. 
+
+If AgentHub is ever missing an operator you need it's only a few lines of python away from existing. Message in the discord for help creating it or raise a PR to add your own custom operator. 
+
+## Documentation
+
+All operators in this repository are thoroughly documented in the `/docs` folder. What makes our documentation truly unique is that it is completely generated using GPT-4 via an AgentHub automation. We run this automation regularly ensuring it is always up-to-date and in sync with the current state of the project.
+
+To access the operator documentation, navigate to the `/docs` directory, or you can view it online [here](https://github.com/agenthubdev/agenthub_operators/tree/main/docs).
+
+## Contributing
+
+We warmly welcome contributions! If you've devised a new operator and want to share it with the community, feel free to submit a pull request.
+
+## Community
+
+For those of you who need assistance, wish to discuss ideas, or just want to be part of the developer community, join us on Discord! Here's our [Discord invite link](https://discord.gg/SyCVmrzhCc).
