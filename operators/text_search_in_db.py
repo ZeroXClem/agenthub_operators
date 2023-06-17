@@ -39,7 +39,8 @@ class TextSearchInDb(BaseOperator):
             {
                 "name": "team_name",
                 "data_type": "string",
-                "placeholder": "Team name in case visibility=team above."
+                "placeholder": "Team name in case visibility=team above.",
+                "condition": "visibility == team"
             },
             {
                 "name": "language",

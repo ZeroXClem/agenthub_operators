@@ -25,11 +25,13 @@ class StoreInDb(BaseOperator):
             {
                 "name": "visibility",
                 "data_type": "enum(team,user,public)",
+                "description": "*visibility=user* means that everybody who runs the pipeline/agent would store in their own private database table and nobody else could access it. *visibility=team* is same as user level but for the team, i.e. table is visible only to the team members. *visibility=public* will write to table that everybody can access."
             },
             {
                 "name": "team_name",
                 "data_type": "string",
-                "placeholder": "Team name that will have access to subject table"
+                "placeholder": "Team name that will have access to subject table",
+                "condition": "visibility == team"
             },
             {
                 "name": "split_by",
@@ -38,7 +40,8 @@ class StoreInDb(BaseOperator):
             {
                 "name": "chunk_size_words",
                 "data_type": "string",
-                "placeholder": "Desired word count in each chunk"
+                "placeholder": "Desired word count in each chunk",
+                "condition": "split_by == chunk"
             },
             {
                 "name": "language",

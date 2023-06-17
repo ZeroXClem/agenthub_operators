@@ -40,10 +40,16 @@ class AskChatGpt(BaseOperator):
     def declare_inputs():
         return [
             {
+                "name": "question",
+                "data_type": "string",
+                "optional": "1"
+            },
+            {
                 "name": "context",
                 "data_type": "string",
                 "optional": "1"
             },
+            
         ]
     
     @staticmethod 
@@ -57,25 +63,22 @@ class AskChatGpt(BaseOperator):
 
     def run_step(self, step, ai_context):
         p = step['parameters']
+        question = p.get('question') or ai_context.get_input('question', self)
+        # We want to take context both from parameter and input.
         input_context = ai_context.get_input('context', self)
-        prompt = p['question']
-        param_context = p.get('context')
+        parameter_context = p.get('context')
         
-        if input_context and param_context:
-            context = f'[{input_context}] [{param_context}]'
-        elif input_context:
-            context = f'[{input_context}]'
-        elif param_context:
-            context = f'[{param_context}]'
-        else:
-            context = None
+        context = ''
+        if input_context:
+            context += f'[{input_context}]'
+        
+        if parameter_context:
+            context += f'[{parameter_context}]'
 
         if context:
-            prompt = f'Given the context: {context}, answer the question or complete the following task: {prompt}'
+            question = f'Given the context: {context}, answer the question or complete the following task: {question}'
 
-        ai_response = ai_context.run_chat_completion(prompt=prompt)
+        ai_response = ai_context.run_chat_completion(prompt=question)
         ai_context.set_output('chatgpt_response', ai_response, self)
         ai_context.add_to_log(f'Response from ChatGPT: {ai_response}', save=True)
-
-        
         

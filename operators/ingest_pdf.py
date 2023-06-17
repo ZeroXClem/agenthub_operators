@@ -18,6 +18,9 @@ class IngestPDF(BaseOperator):
     def declare_name():
         return 'Ingest PDF'
     
+    def declare_description():
+        return 'Operator to take PDF and conert into blob of text. PDF can be an URI or a file that user uploaded to their workspace on AgentHub. Either option can be an input of parameter.'
+    
     @staticmethod
     def declare_category():
         return BaseOperator.OperatorCategory.CONSUME_DATA.value
@@ -52,7 +55,12 @@ class IngestPDF(BaseOperator):
     def declare_inputs():
         return [
             {
-                "name": "file_name",
+                "name": "pdf_uri",
+                "data_type": "string",
+                "optional": "1"
+            },
+            {
+                "name": "uploaded_file_name",
                 "data_type": "string",
                 "optional": "1"
             }
@@ -73,22 +81,15 @@ class IngestPDF(BaseOperator):
             ai_context: AiContext,
     ):
         params = step['parameters']
-        pdf_uri = params.get('pdf_uri')
-        uploaded_file_name = params.get('uploaded_file_name')
-        file_name = ai_context.get_input('file_name', self)
-        self.ingest(pdf_uri, file_name, uploaded_file_name, ai_context)
+        pdf_uri = params.get('pdf_uri') or ai_context.get_input('pdf_uri', self)
+        uploaded_file_name = params.get('uploaded_file_name') or ai_context.get_input('uploaded_file_name', self)
+        self.ingest(pdf_uri, uploaded_file_name, ai_context)
 
-    def ingest(self, pdf_uri, file_name, uploaded_file_name, ai_context):
-        # Uploaded file name is used to ingest a file previously uploaded to your workspace. 
+    def ingest(self, pdf_uri, uploaded_file_name, ai_context):
         if uploaded_file_name:
             ai_context.add_to_log(f"Loading {uploaded_file_name} from storage.")
             file_data = self.load_pdf_from_storage(uploaded_file_name, False, ai_context)
             ai_context.add_to_log(f"Content from uploaded file {uploaded_file_name} has been scraped.")
-            
-        # If file name has been provided via input, it takes precedence over pdf_uri
-        elif file_name and file_name.strip() != '':
-            file_data = self.load_pdf_from_storage(file_name, True, ai_context)
-            ai_context.add_to_log(f"Content from {file_name} has been scraped.")
             
         elif pdf_uri and self.is_url(pdf_uri):
             file_data = self.load_pdf_from_uri(pdf_uri)
