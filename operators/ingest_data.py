@@ -33,6 +33,7 @@ class IngestData(BaseOperator):
             {
                 "name": "input_url",
                 "data_type": "string",
+                "optional": "1"
             }
         ]
     
