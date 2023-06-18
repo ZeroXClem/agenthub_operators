@@ -11,7 +11,7 @@ from ai_context import AiContext
 class GitHubFileReader(BaseOperator):
     @staticmethod
     def declare_name():
-        return 'Get files from GitHub'
+        return 'Read files from GitHub'
     
     @staticmethod
     def declare_category():
@@ -21,7 +21,7 @@ class GitHubFileReader(BaseOperator):
     def declare_parameters():
         return [
             {
-                "name": "repo_name",
+                "name": "repo_name", 
                 "data_type": "string",
                 "placeholder": "user_name/repository_name"
             },
@@ -51,13 +51,12 @@ class GitHubFileReader(BaseOperator):
     def declare_outputs():
         return [
             {
-                "name": "files",
-                # List of dictionaries, each of which has keys 'name' and 'contnet' set.
-                # All values stored in the dictionary objects are assumed to be strings.
-                # Note that for now the data_type string below is just a string, it has 
-                # no semantic meaning other than the fact that Overlord class would only
-                # connect output of one operator to the input of another if their types match.
-                "data_type": "{name,content}[]",
+                "name": "file_names",
+                "data_type": "string[]",
+            },
+            {
+                "name": "file_contents",
+                "data_type": "string[]",
             }
         ]
 
@@ -66,8 +65,6 @@ class GitHubFileReader(BaseOperator):
         step, 
         ai_context : AiContext
     ):
-        # We expect user to define a json dictionary in the input field that would include
-        # all necessary parameter for the task.
         params = step['parameters']
         self.read_github_files(params, ai_context)
             
@@ -81,7 +78,8 @@ class GitHubFileReader(BaseOperator):
         g = Github(ai_context.get_secret('github_access_token'))
         repo = g.get_repo(repo_name)
 
-        files = []
+        file_names = []
+        file_contents = []
 
         def file_matches_regex(file_path, file_regex):
             if not file_regex:
@@ -100,12 +98,8 @@ class GitHubFileReader(BaseOperator):
                 for item in contents:
                     if item.type == "file" and file_matches_regex(item.path, file_regex):
                         file_content = item.decoded_content.decode('utf-8')
-                        files.append(
-                            {
-                                'name': item.path,
-                                'content': file_content
-                            }
-                        )
+                        file_names.append(item.path)
+                        file_contents.append(file_content)
 
                     elif item.type == "dir":
                         queue.append(item.path)
@@ -113,9 +107,8 @@ class GitHubFileReader(BaseOperator):
         for folder_path in folders:
             bfs_fetch_files(folder_path)
 
-        list_of_file_paths = [d['name'] for d in files]
-        ai_context.add_to_log(f"{self.declare_name()} Fetched {len(list_of_file_paths)} files from GitHub repo {repo_name}:\n\r{list_of_file_paths}", color='blue', save=True)
+        ai_context.add_to_log(f"{self.declare_name()} Fetched {len(file_names)} files from GitHub repo {repo_name}:\n\r{file_names}", color='blue', save=True)
 
-        ai_context.set_output('files', files, self)
+        ai_context.set_output('file_names', file_names, self)
+        ai_context.set_output('file_contents', file_contents, self)
         return True
-

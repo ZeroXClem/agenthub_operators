@@ -33,8 +33,12 @@ class GitHubDocsWriter(BaseOperator):
     def declare_inputs():
         return [
             {
-                "name": "code_content",
-                "data_type": "{name,content}[]"
+                "name": "file_names",
+                "data_type": "string[]"
+            },
+            {
+                "name": "file_contents",
+                "data_type": "string[]"
             }
         ]
     
@@ -48,7 +52,8 @@ class GitHubDocsWriter(BaseOperator):
         ai_context : AiContext
     ):
         params = step['parameters']
-        l = ai_context.get_input('code_content', self)
+        file_names = ai_context.get_input('file_names', self)
+        file_contents = ai_context.get_input('file_contents', self)
 
         g = Github(ai_context.get_secret('github_access_token'))
         repo = g.get_repo(params['repo_name'])
@@ -71,21 +76,20 @@ class GitHubDocsWriter(BaseOperator):
         new_branch_name = f"agent_hub_{ai_context.get_run_id()}"
         GitHubDocsWriter.create_branch_with_backoff(forked_repo, new_branch_name, base_branch.commit.sha)
 
-        run_url = f'https://agenthub.dev/agent?run_id={ai_context.get_run_id()}'
+        run_url = f'https://agenthub.dev/pipeline?run_id={ai_context.get_run_id()}'
 
-        for el in l:
-            file_path = el['name']
+        for file_name, file_content_string in zip(file_names, file_contents):
+            file_path = file_name
             name = os.path.splitext(os.path.basename(file_path))[0] + '.md'
-            file_name = params['docs_folder_name'] + '/' + name
-            file_content_string = el['content']
+            docs_file_name = params['docs_folder_name'] + '/' + name
 
             commit_message = f"{file_path} - commit created by {run_url}"
 
-            if file_name in all_files:
-                file = repo.get_contents(file_name, ref=base_branch_name)
-                forked_repo.update_file(file_name, commit_message, file_content_string.encode("utf-8"), file.sha, branch=new_branch_name)
+            if docs_file_name in all_files:
+                file = repo.get_contents(docs_file_name, ref=base_branch_name)
+                forked_repo.update_file(docs_file_name, commit_message, file_content_string.encode("utf-8"), file.sha, branch=new_branch_name)
             else:
-                forked_repo.create_file(file_name, commit_message, file_content_string.encode("utf-8"), branch=new_branch_name)
+                forked_repo.create_file(docs_file_name, commit_message, file_content_string.encode("utf-8"), branch=new_branch_name)
 
         # Create a pull request to merge the new branch in the forked repository into the original branch
         pr_title = f"PR created by {run_url}"
