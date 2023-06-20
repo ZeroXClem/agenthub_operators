@@ -18,7 +18,13 @@ class Tweet(BaseOperator):
 
     @staticmethod
     def declare_parameters():
-        return []
+        return [
+            {
+                "name": "remove_hashtags",
+                "data_type": "boolean",
+                "placeholder": "Remove all trailing hashtags (default is False)",
+            }
+        ]
 
     @staticmethod
     def declare_inputs():
@@ -53,13 +59,32 @@ class Tweet(BaseOperator):
         step,
         ai_context: AiContext
     ):
+        params = step['parameters']
         tweet_text = ai_context.get_input('tweet_text', self)
-        url = ai_context.storage['ingested_url']
+        remove_hashtags_str = params.get('remove_hashtags')
+        
+        remove_hashtags = False  # Default to False
+        if remove_hashtags_str and remove_hashtags_str.lower() == 'true':
+            remove_hashtags = True
+
+        # Check if 'ingested_url' exists in the storage
+        url = ai_context.storage.get('ingested_url', '')
+
         self.set_twitter_keys_and_secrets(ai_context)
+        
+        if remove_hashtags:
+            tweet_text = self.trim_all_trailing_hashtags(tweet_text)
 
         tweet_status = self.send_tweet(tweet_text, url, ai_context)
         ai_context.set_output('tweet_status', tweet_status, self)
-        ai_context.memory_add_to_list('tweeted_links', url)
+        if url:  # only add to memory if there's a URL
+            ai_context.memory_add_to_list('tweeted_links', url)
+        
+    def trim_all_trailing_hashtags(self, text):
+        words = text.split()
+        while words[-1].startswith('#'):
+            words = words[:-1]
+        return ' '.join(words)
          
     def trim_trailing_hashtags(self, text, url):
         words = text.split()
